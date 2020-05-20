@@ -3,8 +3,8 @@
     Based on https://github.com/iperov/DeepFaceLab
 """
 
-from keras.layers import Dense, Flatten, Input, Reshape
-from keras.models import Model as KerasModel
+from tensorflow.keras.layers import Dense, Flatten, Input, Reshape
+from tensorflow.keras.models import Model as KerasModel
 
 from .original import logger, Model as OriginalModel
 

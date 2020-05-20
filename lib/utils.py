@@ -16,6 +16,10 @@ from socket import timeout as socket_timeout, error as socket_error
 
 from tqdm import tqdm
 
+# CHUAN: AttributeError: 'Logger' object has no attribute 'trace'
+from .logger import FaceswapLogger
+logging.setLoggerClass(FaceswapLogger)
+
 # Global variables
 _image_extensions = [  # pylint:disable=invalid-name
     ".bmp", ".jpeg", ".jpg", ".png", ".tif", ".tiff"]

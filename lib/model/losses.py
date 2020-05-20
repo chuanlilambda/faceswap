@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 import logging
 
-import keras.backend as K
+import tensorflow.keras.backend as K
 import numpy as np
 import tensorflow as tf
 
@@ -15,7 +15,9 @@ if get_backend() == "amd":
     from plaidml.op import extract_image_patches
     from lib.plaidml_utils import pad
 else:
-    from tensorflow import extract_image_patches  # pylint: disable=ungrouped-imports
+    # CHUAN
+    from tensorflow.compat.v1 import extract_image_patches  # pylint: disable=ungrouped-imports
+    # from tensorflow import extract_image_patches  # pylint: disable=ungrouped-imports
     from tensorflow import pad
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name

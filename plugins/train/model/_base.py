@@ -11,12 +11,12 @@ import time
 
 from concurrent import futures
 
-import keras
-from keras import losses
-from keras import backend as K
-from keras.layers import Input
-from keras.models import load_model, Model
-from keras.utils import get_custom_objects, multi_gpu_model
+import tensorflow.keras
+from tensorflow.keras import losses
+from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Input
+from tensorflow.keras.models import load_model, Model
+from tensorflow.keras.utils import get_custom_objects, multi_gpu_model
 
 from lib.serializer import get_serializer
 from lib.model.backup_restore import Backup
@@ -603,7 +603,7 @@ class VRAMSavings():
         logger.debug("Initializing %s: (pingpong: %s, optimizer_savings: %s, "
                      "memory_saving_gradients: %s)", self.__class__.__name__,
                      pingpong, optimizer_savings, memory_saving_gradients)
-        self.is_plaidml = keras.backend.backend() == "plaidml.keras.backend"
+        self.is_plaidml = tensorflow.keras.backend.backend() == "plaidml.keras.backend"
         self.pingpong = self.set_pingpong(pingpong)
         self.optimizer_savings = self.set_optimizer_savings(optimizer_savings)
         self.memory_saving_gradients = self.set_gradient_type(memory_saving_gradients)
@@ -789,7 +789,7 @@ class NNMeta():
         self.name = self.set_name()
         self.network = network
         self.is_output = is_output
-        self.network.name = self.name
+        self.network._name = self.name
         self.config = network.get_config()  # For pingpong restore
         self.weights = network.get_weights()  # For pingpong restore
         logger.debug("Initialized %s", self.__class__.__name__)

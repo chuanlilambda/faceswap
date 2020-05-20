@@ -7,12 +7,12 @@ import sys
 import inspect
 
 import tensorflow as tf
-import keras.backend as K
+import tensorflow.keras.backend as K
 
-from keras.engine import InputSpec, Layer
-from keras.utils import conv_utils
-from keras.utils.generic_utils import get_custom_objects
-from keras.layers.pooling import _GlobalPooling2D
+from tensorflow.keras.layers import InputSpec, Layer
+from tensorflow.python.keras.utils import conv_utils
+from tensorflow.keras.utils import get_custom_objects
+from tensorflow.python.keras.layers.pooling import GlobalPooling2D
 
 from lib.utils import get_backend
 
@@ -63,7 +63,7 @@ class PixelShuffler(Layer):
     """
     def __init__(self, size=(2, 2), data_format=None, **kwargs):
         super().__init__(**kwargs)
-        self.data_format = K.normalize_data_format(data_format)
+        self.data_format = K.image_data_format()
         self.size = conv_utils.normalize_tuple(size, 2, "size")
 
     def call(self, inputs, **kwargs):
@@ -507,7 +507,7 @@ class ReflectionPadding2D(Layer):
         return dict(list(base_config.items()) + list(config.items()))
 
 
-class GlobalMinPooling2D(_GlobalPooling2D):
+class GlobalMinPooling2D(GlobalPooling2D):
     """Global minimum pooling operation for spatial data. """
 
     def call(self, inputs):
@@ -532,7 +532,7 @@ class GlobalMinPooling2D(_GlobalPooling2D):
         return pooled
 
 
-class GlobalStdDevPooling2D(_GlobalPooling2D):
+class GlobalStdDevPooling2D(GlobalPooling2D):
     """Global standard deviation pooling operation for spatial data. """
 
     def call(self, inputs):

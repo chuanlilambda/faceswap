@@ -3,11 +3,8 @@
 
 import logging
 
-from keras.layers import Add, SeparableConv2D
-from keras.layers.advanced_activations import LeakyReLU
-from keras.layers.convolutional import Conv2D
-from keras.layers.core import Activation
-from keras.initializers import he_uniform, VarianceScaling
+from tensorflow.keras.layers import Add, SeparableConv2D, LeakyReLU, Conv2D, Activation
+from tensorflow.keras.initializers import he_uniform, VarianceScaling
 from .initializers import ICNR, ConvolutionAware
 from .layers import PixelShuffler, ReflectionPadding2D
 from .normalization import InstanceNormalization

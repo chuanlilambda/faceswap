@@ -15,7 +15,7 @@ from subprocess import CalledProcessError, run, PIPE, Popen
 INSTALL_FAILED = False
 # Revisions of tensorflow-gpu and cuda/cudnn requirements
 TENSORFLOW_REQUIREMENTS = {"==1.12.0": ["9.0", "7.2"],
-                           ">=1.13.1,<1.16": ["10.0", "7.4"]}  # TF 2.0 Not currently supported
+                           ">=1.13.1,<2.3.0": ["10.0", "7.4"]}  # TF 2.0 Not currently supported
 # Mapping of Python packages to their conda names if different from pypi or in non-default channel
 CONDA_MAPPING = {
     # "opencv-python": ("opencv", "conda-forge"),  # Periodic issues with conda-forge opencv
@@ -221,7 +221,7 @@ class Environment():
             return
 
         if not self.enable_cuda:
-            self.required_packages.append("tensorflow==1.15.0")
+            self.required_packages.append("tensorflow==2.2.0")
             return
 
         tf_ver = None
@@ -267,9 +267,9 @@ class Environment():
     def update_tf_dep_conda(self):
         """ Update Conda TF Dependency """
         if not self.enable_cuda:
-            self.required_packages.append("tensorflow==1.15.0")
+            self.required_packages.append("tensorflow==2.2.0")
         else:
-            self.required_packages.append("tensorflow-gpu==1.15.0")
+            self.required_packages.append("tensorflow-gpu==2.2.0")
 
     def update_amd_dep(self):
         """ Update amd dependency for AMD cards """

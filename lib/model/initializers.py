@@ -7,9 +7,9 @@ import inspect
 
 import numpy as np
 import tensorflow as tf
-from keras import backend as K
-from keras import initializers
-from keras.utils.generic_utils import get_custom_objects
+from tensorflow.keras import backend as K
+from tensorflow.keras import initializers
+from tensorflow.keras.utils import get_custom_objects
 
 from lib.utils import get_backend
 

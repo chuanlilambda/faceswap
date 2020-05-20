@@ -83,3 +83,8 @@ model = PluginLoader.get_model(trainer_name)(
     memory_saving_gradients=memory_saving_gradients,
     optimizer_savings=optimizer_savings,
     predict=predict)
+
+for i in range(10):
+    print(i)
+    model.predictors['a'].train_on_batch(model_inputs, model_targets)
+    model.predictors['b'].train_on_batch(model_inputs, model_targets)

@@ -1,90 +1,108 @@
 import logging
 import numpy as np
-
+import matplotlib.pyplot as plt
+import time
 
 from plugins.plugin_loader import PluginLoader
-from lib.utils import get_folder
+from lib.utils import get_folder, get_image_paths
 
 import tensorflow as tf
 
 
+# from tensorflow.python.framework.ops import disable_eager_execution
+# disable_eager_execution()
+
 # global variables
-batch_size = 16
+num_gpu = 1
+batch_size = 128
 input_shape = (128, 128, 3)
 output_shape = (128, 128, 3)
 trainer_name = 'dfl-h128'
-
-# Synthetic Data
-model_inputs = [
-    np.zeros(
-        (batch_size,
-         input_shape[0],
-         input_shape[1],
-         input_shape[2])
-    ),
-    np.zeros(
-        (batch_size,
-         input_shape[0],
-         input_shape[1],
-         1)
-    )
-]
-    
-model_targets = [
-    np.zeros(
-        (batch_size,
-         input_shape[0],
-         input_shape[1],
-         input_shape[2])
-    ),
-    np.zeros(
-        (batch_size,
-         input_shape[0],
-         input_shape[1],
-         1)
-    )
-]
+dir_a = '/home/ubuntu/faceswap/data/faces/trump/*'
+dir_b = '/home/ubuntu/faceswap/data/faces/fauci/*'
 
 
-# Model
+# strategy = tf.distribute.MirroredStrategy(
+#     devices=["/gpu:0", "/gpu:1"])
+# num_gpu = 2
 
-# Create Model
-trainer_name = 'dfl-h128'
-model_dir = get_folder('/home/ubuntu/faceswap/trump_fauci_model_realface')
-gpus = 2
-configfile = None
-snapshot_interval = 25000
-no_logs = False
-warp_to_landmarks = False
-augment_color = False
-no_flip = True
-training_image_size = 256
-alignments_paths = {'a': '/home/ubuntu/faceswap/data/src/trump/trump_alignments.fsa', 'b': '/home/ubuntu/faceswap/data/src/fauci/fauci_alignments.fsa'}
-preview_scale = 50
-pingpong = False
-memory_saving_gradients = False
-optimizer_savings = False
-predict = False
+strategy = tf.distribute.MirroredStrategy(
+    devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3"]
+)
+num_gpu = 4
+
+# strategy = tf.distribute.MirroredStrategy(
+#     devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"]
+# )
+# num_gpu = 8
+
+# strategy = tf.distribute.MirroredStrategy(
+#     devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7",
+#              "/gpu:8", "/gpu:9", "/gpu:10", "/gpu:11", "/gpu:12", "/gpu:13", "/gpu:14", "/gpu:15"]
+# )
+# num_gpu = 16
 
 
-model = PluginLoader.get_model(trainer_name)(
-    model_dir,
-    gpus=gpus,
-    configfile=configfile,
-    snapshot_interval=snapshot_interval,
-    no_logs=no_logs,
-    warp_to_landmarks=warp_to_landmarks,
-    augment_color=augment_color,
-    no_flip=no_flip,
-    training_image_size=training_image_size,
-    alignments_paths=alignments_paths,
-    preview_scale=preview_scale,
-    pingpong=pingpong,
-    memory_saving_gradients=memory_saving_gradients,
-    optimizer_savings=optimizer_savings,
-    predict=predict)
+def parse_image(filename):
+  image = tf.io.read_file(filename)
+  image = tf.image.decode_jpeg(image)
+  image = tf.image.convert_image_dtype(image, tf.float32)
+  image = tf.image.resize(image, [input_shape[0], input_shape[1]])
+  return image, image
 
-for i in range(10):
-    print(i)
-    model.predictors['a'].train_on_batch(model_inputs, model_targets)
-    model.predictors['b'].train_on_batch(model_inputs, model_targets)
+def show(image):
+  plt.figure()
+  plt.imshow(image)
+  plt.axis('off')
+  plt.show()
+
+
+with strategy.scope():
+
+    images_ds_a = tf.data.Dataset.list_files(
+            dir_a).map(
+            parse_image,
+            num_parallel_calls=tf.data.experimental.AUTOTUNE).batch(
+            batch_size * num_gpu,
+            drop_remainder=True).prefetch(
+            tf.data.experimental.AUTOTUNE)
+
+    # Create Model
+    trainer_name = 'dfl-h128'
+    model_dir = get_folder('/home/ubuntu/faceswap/trump_fauci_model_realface')
+    gpus = 2
+    configfile = None
+    snapshot_interval = 25000
+    no_logs = False
+    warp_to_landmarks = False
+    augment_color = False
+    no_flip = True
+    training_image_size = 256
+    alignments_paths = None
+    preview_scale = 50
+    pingpong = False
+    memory_saving_gradients = False
+    optimizer_savings = False
+    predict = False
+
+    model = PluginLoader.get_model(trainer_name)(
+        model_dir,
+        gpus=gpus,
+        configfile=configfile,
+        snapshot_interval=snapshot_interval,
+        no_logs=no_logs,
+        warp_to_landmarks=warp_to_landmarks,
+        augment_color=augment_color,
+        no_flip=no_flip,
+        training_image_size=training_image_size,
+        alignments_paths=alignments_paths,
+        preview_scale=preview_scale,
+        pingpong=pingpong,
+        memory_saving_gradients=memory_saving_gradients,
+        optimizer_savings=optimizer_savings,
+        predict=predict)
+
+# Really fast
+start_time = time.perf_counter()
+model.predictors['a'].fit(images_ds_a, epochs=2)
+print("fit Execution time: {}".format(time.perf_counter() - start_time))

@@ -11,6 +11,7 @@ import time
 
 from concurrent import futures
 
+import tensorflow as tf
 import tensorflow.keras
 from tensorflow.keras import losses
 from tensorflow.keras import backend as K
@@ -320,9 +321,10 @@ class ModelBase():
     def add_predictor(self, side, model):
         """ Add a predictor to the predictors dictionary """
         logger.debug("Adding predictor: (side: '%s', model: %s)", side, model)
-        if self.gpus > 1:
-            logger.debug("Converting to multi-gpu: side %s", side)
-            model = multi_gpu_model(model, self.gpus)
+        # CHUAN: deprecate multi_gpu_model, use distribute.Strategy instead
+        # if self.gpus > 1:
+        #     logger.debug("Converting to multi-gpu: side %s", side)
+        #     model = multi_gpu_model(model, self.gpus)
         self.predictors[side] = model
         if not self.state.inputs:
             self.store_input_shapes(model)
@@ -361,7 +363,9 @@ class ModelBase():
         """ Compile the predictors """
         logger.debug("Compiling Predictors")
         learning_rate = self.config.get("learning_rate", 5e-5)
-        optimizer = self.get_optimizer(lr=learning_rate, beta_1=0.5, beta_2=0.999)
+        # CHUAN: Customized Adam doesn't run in TF2 non-eager mode
+        # optimizer = self.get_optimizer(lr=learning_rate, beta_1=0.5, beta_2=0.999)
+        optimizer = tf.keras.optimizers.Adam(lr=learning_rate, beta_1=0.5, beta_2=0.999)
 
         for side, model in self.predictors.items():
             loss = Loss(model.inputs, model.outputs)

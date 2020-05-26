@@ -8,6 +8,8 @@ from lib.utils import get_folder, get_image_paths
 
 import tensorflow as tf
 
+# import tensorflow.compat.v1 as tf
+# tf.disable_v2_behavior()
 
 # from tensorflow.python.framework.ops import disable_eager_execution
 # disable_eager_execution()
@@ -102,13 +104,26 @@ with strategy.scope():
         optimizer_savings=optimizer_savings,
         predict=predict)
 
+iterator_a = iter(images_ds_a)
 # Warm up
-for data_a in images_ds_a.take(1):
-    model.predictors['a'].train_on_batch(data_a[0], data_a[1])
+for i in range(1):
+    data_a = iterator_a.get_next()
 
 t_start = time.time()
 num_iter = 20
-for data_a in images_ds_a.take(num_iter):
+for i in range(num_iter):
+    data_a = iterator_a.get_next()
     model.predictors['a'].train_on_batch(data_a[0], data_a[1])
 t_end = time.time()
 print("average time per step: {}".format((t_end - t_start) / num_iter))
+
+# for data_a in images_ds_a.take(1):
+#     print(data_a)
+    # model.predictors['a'].train_on_batch(data_a[0], data_a[1])
+
+# t_start = time.time()
+# num_iter = 20
+# for data_a in images_ds_a.take(num_iter):
+#     model.predictors['a'].train_on_batch(data_a[0], data_a[1])
+# t_end = time.time()
+# print("average time per step: {}".format((t_end - t_start) / num_iter))

@@ -22,14 +22,14 @@ dir_a = '/home/ubuntu/faceswap/data/faces/trump/*'
 dir_b = '/home/ubuntu/faceswap/data/faces/fauci/*'
 
 
-# strategy = tf.distribute.MirroredStrategy(
-#     devices=["/gpu:0", "/gpu:1"])
-# num_gpu = 2
-
 strategy = tf.distribute.MirroredStrategy(
-    devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3"]
-)
-num_gpu = 4
+    devices=["/gpu:0", "/gpu:1"])
+num_gpu = 2
+
+# strategy = tf.distribute.MirroredStrategy(
+#     devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3"]
+# )
+# num_gpu = 4
 
 # strategy = tf.distribute.MirroredStrategy(
 #     devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"]

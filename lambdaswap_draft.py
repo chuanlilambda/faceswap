@@ -85,31 +85,34 @@ num_gpu = 2
 #     )
 # ]
 
-## Real data without mask
-# def get_images():
-#     """ Check the image folders exist and contains images and obtain image paths.
+# Real data without mask
+def get_images():
+    """ Check the image folders exist and contains images and obtain image paths.
 
-#     Returns
-#     -------
-#     dict
-#         The image paths for each side. The key is the side, the value is the list of paths
-#         for that side.
-#     """
-#     images = dict()
-#     for side in ("a", "b"):
-#         # image_dir = getattr(self._args, "input_{}".format(side))
-#         if side == "a":
-#             image_dir = '/home/ubuntu/faceswap/data/faces/trump'
-#         if side == "b":
-#             image_dir = '/home/ubuntu/faceswap/data/faces/fauci'
+    Returns
+    -------
+    dict
+        The image paths for each side. The key is the side, the value is the list of paths
+        for that side.
+    """
+    images = dict()
+    for side in ("a", "b"):
+        # image_dir = getattr(self._args, "input_{}".format(side))
+        if side == "a":
+            image_dir = '/home/ubuntu/faceswap/data/faces/trump'
+        if side == "b":
+            image_dir = '/home/ubuntu/faceswap/data/faces/fauci'
 
-#         images[side] = get_image_paths(image_dir)
+        images[side] = get_image_paths(image_dir)
 
-#     return images
+    return images
 
-# images = get_images()
+images = get_images()
 
 # print(images)
+
+import sys
+sys.exit()
 
 
 def parse_image(filename):

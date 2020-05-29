@@ -19,7 +19,7 @@ mask_type = 'unet-dfl'
 mask_blur_kernel = 3
 mask_threshold = 4
 learn_mask = True
-
+batch_size = 4
 
 def get_images(path_a, path_b):
     """ Check the image folders exist and contains images and obtain image paths.
@@ -115,6 +115,12 @@ dataset = tf.data.Dataset.from_generator(
 	 	tf.TensorShape([input_shape[0], input_shape[1], input_shape[2]]),
 	 	tf.TensorShape([input_shape[0], input_shape[1], 1])
 	)
+)
+
+
+dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE).batch(
+	batch_size,
+	drop_remainder=True
 )
 
 
